@@ -24,7 +24,7 @@ const byte PATTERN_COUNT = 8;
 const byte MAX_STEP_COUNT = 16;
 
 const bool patterns[PATTERN_COUNT][MAX_STEP_COUNT] = {
-  { OO OO OO OO OO OO OO OO XX OO XX OO OO OO OO OO },  
+  { OO OO OO OO OO OO OO OO OO OO OO OO OO OO OO OO },  
   { XX OO OO OO OO OO OO OO XX OO XX OO OO OO OO OO },
   { XX OO OO OO OO OO OO OO XX XX XX OO OO OO OO XX },
   { XX XX XX OO OO OO OO OO XX OO XX OO OO OO XX OO },
@@ -68,7 +68,7 @@ void setup() {
   
   kTriggerDelay.set(10); // countdown ms, within resolution of CONTROL_RATE
 }
-bool ledOn = false;
+
 void updateControl(){
   // if the sequencer is not running...
   if (digitalRead(2) == LOW) {
@@ -85,10 +85,6 @@ void updateControl(){
   if(kTriggerDelay.ready()){    
     if (patterns[pattern1][pattern1Beat]) {
       aBamboo0.start();
-//      if (ledOn) { digitalWrite(13, LOW);
-//      } else { //        digitalWrite(13, HIGH);
-//      }
-//      ledOn =!ledOn;
     }
     if (patterns[pattern2][pattern2Beat]) {
       aBamboo1.start();
@@ -106,13 +102,14 @@ void updateControl(){
     if (++pattern3Beat >= pattern3Length) {
       pattern3Beat = 0;
     }
+
+    // tempo read
     kTriggerDelay.start(map(mozziAnalogRead(4), 0, 1023, 300, 50));
   }
 }
 
 
 int updateAudio(){
-//  return MonoOutput::from16Bit(aBamboo0.next()*255);
 //  return (int)aBamboo0.next();// *255;
   
   int asig= (int)
