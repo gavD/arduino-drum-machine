@@ -4,13 +4,13 @@ DIY Hackable Arduino Drum Machine
 Overview
 --
 
-This project is an Arduino DIY drum machine, based on the Mozzi open source library, which uses 8-bit samples. It uses 3 channels, each with 3 selectable voices.  Each voice has a pattern selector to choose the beat pattern, and a sequence length.
+This project is an Arduino DIY drum machine, based on the Mozzi open source library, which uses 8-bit samples. It uses 3 channels, each with 3 selectable voices.  Each voice has a pattern selector to choose sequence length and number of beats. This uses Euclidean maths, a bit like a simple version of the Euclidean Circles module.
 
 So, for example, you could have channel A playing a pattern of 16 steps, with channel B playing 7 steps. This way, you can get polymetric rhythms.
 
 ![img/fully-built-drum-machine.jpg](img/fully-built-drum-machine.jpg)
 
-It comes loaded with samples taken from a Yamaha DD-5 digital drum machine, but you can load on anything you like!
+It comes loaded with samples taken from a Yamaha DD-5 digital drum machine, but you can load anything you like!
 
 Hardware: Building a DIY Arduino Drum Machine
 --
@@ -23,21 +23,23 @@ I'll assume you're using an Arduino Nano - you do need at least 8 Analog inputs 
 
 Here is a Bill of materials (BOM) for the components as I've used them:
 
-Pin | Component          | Purpose
---- |--------------------| --- 
+Pin | Component         | Purpose
+--- |-------------------| --- 
 Analog 0 | B10k pot | Swing amount
-Analog 1 | B10k pot | Channel A pattern
-Analog 2 | B10k pot | Channel B pattern
-Analog 3 | B10k pot | Channel C pattern
+Analog 1 | B10k pot | Channel A beat density
+Analog 2 | B10k pot | Channel B beat density
+Analog 3 | B10k pot | Channel C beat density
 Analog 4 | B10k pot | Tempo
 Analog 5 | B10k pot | Channel A sequence length (1-16 steps)
 Analog 6 | B10k pot | Channel B sequence length (1-16 steps)
 Analog 7 | B10k pot | Channel C sequence length (1-16 steps)
-Digital 2 | 2 position switch  | Starts and stops the drum machine
-Digital 3 and Digital 4 | 3 position switch  | Select voice C
-Digital 5 and Digital 6 | 3 position switch  | Select voice B
-Digital 7 and Digital 8 | 3 position switch  | Select voice A
+Digital 2 | 2 position switch | Starts and stops the drum machine
+Digital 3 and Digital 4 | 3 position switch | Select voice C
+Digital 5 and Digital 6 | 3 position switch | Select voice B
+Digital 7 and Digital 8 | 3 position switch | Select voice A
 Digital 9 | Mono jack socket | Audio out 
+
+The beat density is a proportion of the sequence length. So, if sequence length is 8, beat density will be from 0-8 beats. Beats are spaced as evenly as possible in the sequence. Experiment with different settings to create polymetric rhythms!
 
 Here's an example of how I've built mine, excuse the poor photos, I don't have a good camera:
 
@@ -116,3 +118,4 @@ This machine is totally hackable! You could:
 3. Switch from predefined patterns to Euclidean distribution of pulses
 4. Vary velocities
 5. Pitch control of the voices (or a global pitch control!)
+6. Voice randomisation

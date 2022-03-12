@@ -38,30 +38,11 @@ Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample3 = &aHiHat;
 EventDelay kTriggerDelay;
 
 unsigned int tempoMs = 111;
-const byte PATTERN_COUNT = 8;
 const byte MAX_STEP_COUNT = 16;
 
-const bool patterns[PATTERN_COUNT][MAX_STEP_COUNT] = {
-  { __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ },
-  { XX __ __ __ __ __ __ __ XX __ XX __ __ __ __ __ },
-  { XX __ __ __ __ __ __ __ XX XX XX __ __ __ __ XX },
-  { XX XX XX __ __ __ __ __ XX __ XX __ __ __ XX __ },
-  { XX XX XX XX XX XX XX __ XX XX XX XX XX XX XX __ },
-  { XX __ __ XX XX __ __ __ XX __ XX __ XX XX __ __ },
-  { XX __ XX __ XX __ XX __ XX __ XX __ XX __ XX __ },
-  { XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX },
-};
-byte pattern1 = 0;
-byte pattern1Length = 16;
-byte pattern1Beat = 0;
-
-byte pattern2 = 0;
-byte pattern2Length = 16;
-byte pattern2Beat = 5;
-
-byte pattern3 = 0;
-byte pattern3Length = 16;
-byte pattern3Beat = 9;
+byte cursor1 = 0;
+byte cursor2 = 0;
+byte cursor3 = 0;
 
 // TODO
 // https://diyelectromusic.wordpress.com/2021/06/22/arduino-mozzi-sample-drum-machine/
@@ -90,6 +71,22 @@ void setup() {
   aSnare.setFreq((float) SNARE_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
 
   kTriggerDelay.set(10); // countdown ms, within resolution of CONTROL_RATE
+}
+
+
+bool shouldPlay(byte steps, byte beats, byte i) {
+  float divisor = ((float)beats / (float)steps);
+  
+  bool shouldPlay;
+  if (i == 0) {
+    shouldPlay = (beats != 0);
+  } else {
+    byte score = i * divisor;
+    byte prevScore = (i - 1) * divisor;
+    shouldPlay = (score > prevScore);
+  }
+
+  return shouldPlay;
 }
 
 void updateControl(){
@@ -123,34 +120,38 @@ void updateControl(){
     sample3 = &aHiHat;
   }
 
-  // read the pattern selections and lengths
-  pattern1 = (byte) map(mozziAnalogRead(1), 0, 1023, 0, (PATTERN_COUNT-1));
-  pattern1Length = (byte) map(mozziAnalogRead(5), 0, 1023, 0, MAX_STEP_COUNT);
-  pattern2 = (byte) map(mozziAnalogRead(2), 0, 1023, 0, (PATTERN_COUNT-1));
-  pattern2Length = (byte) map(mozziAnalogRead(6), 0, 1023, 0, MAX_STEP_COUNT);
-  pattern3 = (byte) map(mozziAnalogRead(3), 0, 1023, 0, (PATTERN_COUNT-1));
-  pattern3Length = (byte) map(mozziAnalogRead(7), 0, 1023, 0, MAX_STEP_COUNT);
-
+  // read the step lengths and beat densities
+  byte steps1 = (byte) map(mozziAnalogRead(5), 0, 1023, 1, MAX_STEP_COUNT);
+  byte beats1 = (byte) map(mozziAnalogRead(1), 0, 1023, 0, steps1);
+  byte steps2 = (byte) map(mozziAnalogRead(6), 0, 1023, 1, MAX_STEP_COUNT);
+  byte beats2 = (byte) map(mozziAnalogRead(2), 0, 1023, 0, steps2);
+  byte steps3 = (byte) map(mozziAnalogRead(7), 0, 1023, 1, MAX_STEP_COUNT);
+  byte beats3 = (byte) map(mozziAnalogRead(3), 0, 1023, 0, steps3);
+  
   if(kTriggerDelay.ready()){
-    if (patterns[pattern1][pattern1Beat]) {
+    if (cursor1 >= steps1) {
+      cursor1 = 0;
+    }
+    if (cursor2 >= steps2) {
+      cursor2 = 0;
+    }
+    if (cursor3 >= steps3) {
+      cursor3 = 0;
+    }
+    
+    if(shouldPlay(steps1, beats1, cursor1)) {
       (*sample1).start();
     }
-    if (patterns[pattern2][pattern2Beat]) {
+    if(shouldPlay(steps2, beats2, cursor2)) {
       (*sample2).start();
     }
-    if (patterns[pattern3][pattern3Beat]) {
+    if(shouldPlay(steps3, beats3, cursor3)) {
       (*sample3).start();
     }
 
-    if (++pattern1Beat >= pattern1Length) {
-      pattern1Beat = 0;
-    }
-    if (++pattern2Beat >= pattern2Length) {
-      pattern2Beat = 0;
-    }
-    if (++pattern3Beat >= pattern3Length) {
-      pattern3Beat = 0;
-    }
+    cursor1++;
+    cursor2++;
+    cursor3++;
 
     // tempo read
     kTriggerDelay.start(map(mozziAnalogRead(4), 0, 1023, 300, 50));
