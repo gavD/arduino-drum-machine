@@ -4,12 +4,12 @@
 #include <samples/bamboo/bamboo_00_2048_int8.h> // wavetable data
 #include <samples/bamboo/bamboo_01_2048_int8.h> // wavetable data
 #include <samples/bamboo/bamboo_02_2048_int8.h> // wavetable data
-#include "chirp.h" // wavetable data
-#include "clap.h" // wavetable data
-#include "cowbell.h" // wavetable data
-#include "hihat.h" // wavetable data
-#include "kick.h" // wavetable data
-#include "snare.h" // wavetable data
+#include "sfx/chirp.h" // wavetable data
+#include "sfx/clap.h" // wavetable data
+#include "sfx/cowbell.h" // wavetable data
+#include "sfx/hihat.h" // wavetable data
+#include "sfx/kick.h" // wavetable data
+#include "sfx/snare.h" // wavetable data
 #include <EventDelay.h>
 #include <mozzi_rand.h>
 
