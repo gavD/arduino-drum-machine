@@ -4,20 +4,25 @@
 #include <samples/bamboo/bamboo_00_2048_int8.h> // wavetable data
 #include <samples/bamboo/bamboo_01_2048_int8.h> // wavetable data
 #include <samples/bamboo/bamboo_02_2048_int8.h> // wavetable data
+#include "chirp.h" // wavetable data
 #include <EventDelay.h>
 #include <mozzi_rand.h>
-
-// use: Sample <table_size, update_rate> SampleName (wavetable)
-Sample <BAMBOO_00_2048_NUM_CELLS, AUDIO_RATE>aBamboo0(BAMBOO_00_2048_DATA);
-Sample <BAMBOO_01_2048_NUM_CELLS, AUDIO_RATE>aBamboo1(BAMBOO_01_2048_DATA);
-Sample <BAMBOO_02_2048_NUM_CELLS, AUDIO_RATE>aBamboo2(BAMBOO_02_2048_DATA);
-
-// for scheduling audio gain changes
-EventDelay kTriggerDelay;
 
 #define CONTROL_RATE 128
 #define XX true,
 #define OO false,
+#define CELLS_PER_SAMPLE 2048
+
+// use: Sample <table_size, update_rate> SampleName (wavetable)
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo0(BAMBOO_00_2048_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo1(BAMBOO_01_2048_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo2(BAMBOO_02_2048_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aChirp(CHIRP_DATA);
+
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample3 = &aChirp;
+
+// for scheduling audio gain changes
+EventDelay kTriggerDelay;
 
 unsigned int tempoMs = 111;
 const byte PATTERN_COUNT = 8;
@@ -62,9 +67,10 @@ void setup() {
 
   startMozzi();
 
-  aBamboo0.setFreq((float) BAMBOO_00_2048_SAMPLERATE / (float) BAMBOO_00_2048_NUM_CELLS); // play at the speed it was recorded at
-  aBamboo1.setFreq((float) BAMBOO_01_2048_SAMPLERATE / (float) BAMBOO_01_2048_NUM_CELLS);
-  aBamboo2.setFreq((float) BAMBOO_02_2048_SAMPLERATE / (float) BAMBOO_02_2048_NUM_CELLS);
+  aBamboo0.setFreq((float) BAMBOO_00_2048_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded at
+  aBamboo1.setFreq((float) BAMBOO_01_2048_SAMPLERATE / (float) CELLS_PER_SAMPLE);
+  aBamboo2.setFreq((float) BAMBOO_02_2048_SAMPLERATE / (float) CELLS_PER_SAMPLE);
+  aChirp.setFreq((float) CHIRP_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
   
   kTriggerDelay.set(10); // countdown ms, within resolution of CONTROL_RATE
 }
@@ -90,7 +96,7 @@ void updateControl(){
       aBamboo1.start();
     }
     if (patterns[pattern3][pattern3Beat]) {
-      aBamboo2.start();
+      (*sample3).start();
     }
 
     if (++pattern1Beat >= pattern1Length) {
@@ -108,14 +114,13 @@ void updateControl(){
   }
 }
 
-
+// TODO pointer to the current sample in each slot
 int updateAudio(){
-//  return (int)aBamboo0.next();// *255;
-  
+  // sum together the playing samples
   int asig= (int)
     ((long) aBamboo0.next()*255 +
       aBamboo1.next()*255 +
-      aBamboo2.next()*255)>>4;
+      (*sample3).next()*255)>>4;
   
   //clip to keep audio loud but still in range
   if (asig > 243) {

@@ -1,6 +1,8 @@
 DIY Hackable Arduino Drum Machine
 ==
 
+This is **work in progress**!
+
 Overview
 --
 
@@ -8,7 +10,7 @@ This project is an Arduino DIY drum machine, based on the Mozzi open source libr
 
 So, for example, you could have channel A playing a pattern of 16 steps, with channel B playing 7 steps. This way, you can get polymetric rhythms.
 
-![fully-built-drum-machine.jpg](fully-built-drum-machine.jpg)
+![img/fully-built-drum-machine.jpg](img/fully-built-drum-machine.jpg)
 
 Hardware: Building a DIY Arduino Drum Machine
 --
@@ -39,7 +41,11 @@ Digital 9 | Mono jack socket | Audio out
 
 Here's an example of how I've built mine, excuse the poor photos, I don't have a good camera:
 
-![panel-wiring.jpg](panel-wiring.jpg)
+![img/panel-wiring.jpg](img/panel-wiring.jpg)
+
+I drilled hole into a plastic case I bought from [Bitsbox](https://www.bitsbox.co.uk/).
+
+Note that the switches are all in **pullup mode**, so, although I used a red wire, they're going to ground. In this image, I've also croc clipped the negative rail from the jack to the rightmost switch. It's a work in progress shot!
 
 Developing software for the DIY Arduino Drum Machine
 ==
@@ -48,13 +54,48 @@ You'll need:
 
 1. [Arduino IDE](https://www.arduino.cc/en/software/)
 2. [Mozzi library](https://sensorium.github.io/Mozzi/)
-3. [FFMPeg](https://ffmpeg.org/) for converting files on the CLI
-   a. There are other ways to convert the files
+
+If you want to load your own samples, you'll additionally need: 
+
+1. [FFMPeg](https://ffmpeg.org/) for converting WAV files to RAW on the CLI. _There are other ways to convert the files, but FFMpeg is what I use_
+2. [Python](https://www.python.org/) for running char2mozzi.py from the [Mozzi library scripts](https://github.com/sensorium/Mozzi/tree/master/extras/python). _Alternatively, Audacity can output raw audio files_
 
 Loading a sample into the drum machine
 --
 
 You can load whatever samples you like into this box!
+
+Any sample for conversion must be:
+1. In headerless unsigned 8 bit raw format
+2. Mono
+3. Sample rate of 16384
+4. Precisely 2048 samples long _(Audacity, for example, can be configured to show sample count for selections)_
+
+From Audacity, it would look like this:
+
+![img/correct-sample-from-audacity.jpg](img/correct-sample-from-audacity.jpg)
+
+Export to "Other uncompressed files" like:
+
+![img/export-from-audacity.jpg](img/export-from-audacity.jpg)
+
+If you have a WAV, you can convert to RAW with ffmpeg, something like:
+
+```bash
+# Convert a WAV to a signed headerless 8 bit raw file (or output raw from your audio editor)
+# let's convert a file called chirp.wav
+FILE=chirp
+
+ffmpeg -y -i ${FILE}.wav -f s8 -acodec pcm_s8 ${FILE}.raw
+```
+
+Now we can convert that to an 8 bit wavetable that the drum machine can use:
+
+```bash
+# Use char2mozzi.py to convert to a wavetable of the right length (2048)
+# to a C header file that Mozzi can consue
+python ../Mozzi/extras/python/char2mozzi.py ${FILE}.raw ${FILE}.h ${FILE} 16384
+```
 
 Possible modifications
 ==
