@@ -30,9 +30,9 @@ Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aKick(KICK_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aHiHat(HIHAT_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aSnare(SNARE_DATA);
 
-Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample1 = &aChirp;
-Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample2 = &aChirp;
-Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample3 = &aChirp;
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample1 = &aKick;
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample2 = &aSnare;
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample3 = &aHiHat;
 
 // for scheduling audio gain changes
 EventDelay kTriggerDelay;
@@ -69,7 +69,6 @@ byte pattern3Beat = 9;
 // the setup function runs once when you press reset or power the board
 void setup() {
   pinMode(2, INPUT_PULLUP);
-  pinMode(2, INPUT_PULLUP);
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
   pinMode(5, INPUT_PULLUP);
@@ -101,9 +100,9 @@ void updateControl(){
 
   // select the right samples for each voice
   if (digitalRead(7) == LOW) {
-    sample1 = &aKick;
-  } else if (digitalRead(8) == LOW) {
     sample1 = &aChirp;
+  } else if (digitalRead(8) == LOW) {
+    sample1 = &aKick;
   } else {
     sample1 = &aBamboo0;
   }
