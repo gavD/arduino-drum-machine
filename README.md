@@ -1,8 +1,6 @@
 DIY Hackable Arduino Drum Machine
 ==
 
-This is **work in progress**!
-
 Overview
 --
 
@@ -12,6 +10,8 @@ So, for example, you could have channel A playing a pattern of 16 steps, with ch
 
 ![img/fully-built-drum-machine.jpg](img/fully-built-drum-machine.jpg)
 
+It comes loaded with samples taken from a Yamaha DD-5 digital drum machine, but you can load on anything you like!
+
 Hardware: Building a DIY Arduino Drum Machine
 --
 
@@ -19,7 +19,7 @@ You can build it any way you like using whatever case you want! I'll show you ho
 
 I'll assume you're using an Arduino Nano - you do need at least 8 Analog inputs for the full build
 
-> _(you could modify the software to hard-code tempo and swing if you're using an Uno)_
+> _(you could modify the software to hard-code tempo and swing if you're using an Uno, to free up two analog inputs)_
 
 Here is a Bill of materials (BOM) for the components as I've used them:
 
@@ -97,6 +97,15 @@ Now we can convert that to an 8 bit wavetable containing 2048 samples that the d
 python ../Mozzi/extras/python/char2mozzi.py ${FILE}.raw ${FILE}.h ${FILE} 16384
 ```
 
+TODO list
+==
+
+I'm working on:
+
+1. Adding Swing
+2. Clarifying the code + documentation
+3. Producing a video demo/tutorial
+
 Possible modifications
 ==
 
@@ -105,3 +114,5 @@ This machine is totally hackable! You could:
 1. Add trigger outputs for each channel
 2. Add LEDs for each trigger notification
 3. Switch from predefined patterns to Euclidean distribution of pulses
+4. Vary velocities
+5. Pitch control of the voices (or a global pitch control!)

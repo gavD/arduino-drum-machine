@@ -5,6 +5,11 @@
 #include <samples/bamboo/bamboo_01_2048_int8.h> // wavetable data
 #include <samples/bamboo/bamboo_02_2048_int8.h> // wavetable data
 #include "chirp.h" // wavetable data
+#include "clap.h" // wavetable data
+#include "cowbell.h" // wavetable data
+#include "hihat.h" // wavetable data
+#include "kick.h" // wavetable data
+#include "snare.h" // wavetable data
 #include <EventDelay.h>
 #include <mozzi_rand.h>
 
@@ -19,6 +24,11 @@ Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo0(BAMBOO_00_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo1(BAMBOO_01_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo2(BAMBOO_02_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aChirp(CHIRP_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aClap(CLAP_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aCowbell(COWBELL_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aKick(KICK_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aHiHat(HIHAT_DATA);
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aSnare(SNARE_DATA);
 
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample1 = &aChirp;
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample2 = &aChirp;
@@ -74,7 +84,12 @@ void setup() {
   aBamboo1.setFreq((float) BAMBOO_01_2048_SAMPLERATE / (float) CELLS_PER_SAMPLE);
   aBamboo2.setFreq((float) BAMBOO_02_2048_SAMPLERATE / (float) CELLS_PER_SAMPLE);
   aChirp.setFreq((float) CHIRP_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
-  
+  aClap.setFreq((float) CLAP_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
+  aCowbell.setFreq((float) COWBELL_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
+  aHiHat.setFreq((float) HIHAT_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
+  aKick.setFreq((float) KICK_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
+  aSnare.setFreq((float) SNARE_SAMPLERATE / (float) CELLS_PER_SAMPLE); // play at the speed it was recorded
+
   kTriggerDelay.set(10); // countdown ms, within resolution of CONTROL_RATE
 }
 
@@ -86,27 +101,27 @@ void updateControl(){
 
   // select the right samples for each voice
   if (digitalRead(7) == LOW) {
-    sample1 = &aBamboo0;
+    sample1 = &aKick;
   } else if (digitalRead(8) == LOW) {
-    sample1 = &aChirp; // TODO
+    sample1 = &aChirp;
   } else {
-    sample1 = &aBamboo0; // TODO
+    sample1 = &aBamboo0;
   }
-  
+
   if (digitalRead(5) == LOW) {
     sample2 = &aBamboo1;
   } else if (digitalRead(6) == LOW) {
-    sample2 = &aChirp; // TODO
+    sample2 = &aSnare;
   } else {
-    sample2 = &aBamboo1; // TODO
+    sample2 = &aClap;
   }
-  
+
   if (digitalRead(3) == LOW) {
     sample3 = &aBamboo2;
   } else if (digitalRead(4) == LOW) {
-    sample3 = &aChirp;
+    sample3 = &aCowbell;
   } else {
-    sample3 = &aBamboo2; // TODO
+    sample3 = &aHiHat;
   }
 
   // read the pattern selections and lengths
@@ -116,8 +131,8 @@ void updateControl(){
   pattern2Length = (byte) map(mozziAnalogRead(6), 0, 1023, 0, MAX_STEP_COUNT);
   pattern3 = (byte) map(mozziAnalogRead(3), 0, 1023, 0, (PATTERN_COUNT-1));
   pattern3Length = (byte) map(mozziAnalogRead(7), 0, 1023, 0, MAX_STEP_COUNT);
-  
-  if(kTriggerDelay.ready()){    
+
+  if(kTriggerDelay.ready()){
     if (patterns[pattern1][pattern1Beat]) {
       (*sample1).start();
     }
@@ -149,7 +164,7 @@ int updateAudio(){
     ((long) (*sample1).next()*255 +
       (*sample2).next()*255 +
       (*sample3).next()*255)>>4;
-  
+
   //clip to keep audio loud but still in range
   if (asig > 243) {
     asig = 243;
