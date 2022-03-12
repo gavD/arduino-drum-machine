@@ -1,6 +1,8 @@
 DIY Hackable Arduino Drum Machine
 ==
 
+See it in action on Youtube! https://youtu.be/4u4Px2gMwGw
+
 Overview
 --
 
@@ -105,8 +107,6 @@ TODO list
 I'm working on:
 
 1. Adding Swing
-2. Clarifying the code + documentation
-3. Producing a video demo/tutorial
 
 Possible modifications
 ==
