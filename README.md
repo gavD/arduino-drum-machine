@@ -34,9 +34,9 @@ Analog 5 | B10k pot | Channel A sequence length (1-16 steps)
 Analog 6 | B10k pot | Channel B sequence length (1-16 steps)
 Analog 7 | B10k pot | Channel C sequence length (1-16 steps)
 Digital 2 | 2 position switch  | Starts and stops the drum machine
-Digital 3 and Digital 4 | 3 position switch  | Select voice A
+Digital 3 and Digital 4 | 3 position switch  | Select voice C
 Digital 5 and Digital 6 | 3 position switch  | Select voice B
-Digital 7 and Digital 8 | 3 position switch  | Select voice C
+Digital 7 and Digital 8 | 3 position switch  | Select voice A
 Digital 9 | Mono jack socket | Audio out 
 
 Here's an example of how I've built mine, excuse the poor photos, I don't have a good camera:
@@ -89,7 +89,7 @@ FILE=chirp
 ffmpeg -y -i ${FILE}.wav -f s8 -acodec pcm_s8 ${FILE}.raw
 ```
 
-Now we can convert that to an 8 bit wavetable that the drum machine can use:
+Now we can convert that to an 8 bit wavetable containing 2048 samples that the drum machine can use:
 
 ```bash
 # Use char2mozzi.py to convert to a wavetable of the right length (2048)
@@ -104,3 +104,4 @@ This machine is totally hackable! You could:
 
 1. Add trigger outputs for each channel
 2. Add LEDs for each trigger notification
+3. Switch from predefined patterns to Euclidean distribution of pulses

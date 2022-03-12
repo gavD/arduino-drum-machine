@@ -10,15 +10,18 @@
 
 #define CONTROL_RATE 128
 #define XX true,
-#define OO false,
+#define __ false,
 #define CELLS_PER_SAMPLE 2048
 
+// Bank of sample
 // use: Sample <table_size, update_rate> SampleName (wavetable)
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo0(BAMBOO_00_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo1(BAMBOO_01_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aBamboo2(BAMBOO_02_2048_DATA);
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE>aChirp(CHIRP_DATA);
 
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample1 = &aChirp;
+Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample2 = &aChirp;
 Sample <CELLS_PER_SAMPLE, AUDIO_RATE> *sample3 = &aChirp;
 
 // for scheduling audio gain changes
@@ -29,13 +32,13 @@ const byte PATTERN_COUNT = 8;
 const byte MAX_STEP_COUNT = 16;
 
 const bool patterns[PATTERN_COUNT][MAX_STEP_COUNT] = {
-  { OO OO OO OO OO OO OO OO OO OO OO OO OO OO OO OO },  
-  { XX OO OO OO OO OO OO OO XX OO XX OO OO OO OO OO },
-  { XX OO OO OO OO OO OO OO XX XX XX OO OO OO OO XX },
-  { XX XX XX OO OO OO OO OO XX OO XX OO OO OO XX OO },
-  { XX XX XX XX XX XX XX OO XX XX XX XX XX XX XX OO },
-  { XX OO OO XX XX OO OO OO XX OO XX OO XX XX OO OO },
-  { XX OO XX OO XX OO XX OO XX OO XX OO XX OO XX OO },
+  { __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ __ },
+  { XX __ __ __ __ __ __ __ XX __ XX __ __ __ __ __ },
+  { XX __ __ __ __ __ __ __ XX XX XX __ __ __ __ XX },
+  { XX XX XX __ __ __ __ __ XX __ XX __ __ __ XX __ },
+  { XX XX XX XX XX XX XX __ XX XX XX XX XX XX XX __ },
+  { XX __ __ XX XX __ __ __ XX __ XX __ XX XX __ __ },
+  { XX __ XX __ XX __ XX __ XX __ XX __ XX __ XX __ },
   { XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX XX },
 };
 byte pattern1 = 0;
@@ -76,11 +79,37 @@ void setup() {
 }
 
 void updateControl(){
-  // if the sequencer is not running...
+  // if the sequencer is not running, take no action...
   if (digitalRead(2) == LOW) {
     return;
   }
 
+  // select the right samples for each voice
+  if (digitalRead(7) == LOW) {
+    sample1 = &aBamboo0;
+  } else if (digitalRead(8) == LOW) {
+    sample1 = &aChirp; // TODO
+  } else {
+    sample1 = &aBamboo0; // TODO
+  }
+  
+  if (digitalRead(5) == LOW) {
+    sample2 = &aBamboo1;
+  } else if (digitalRead(6) == LOW) {
+    sample2 = &aChirp; // TODO
+  } else {
+    sample2 = &aBamboo1; // TODO
+  }
+  
+  if (digitalRead(3) == LOW) {
+    sample3 = &aBamboo2;
+  } else if (digitalRead(4) == LOW) {
+    sample3 = &aChirp;
+  } else {
+    sample3 = &aBamboo2; // TODO
+  }
+
+  // read the pattern selections and lengths
   pattern1 = (byte) map(mozziAnalogRead(1), 0, 1023, 0, (PATTERN_COUNT-1));
   pattern1Length = (byte) map(mozziAnalogRead(5), 0, 1023, 0, MAX_STEP_COUNT);
   pattern2 = (byte) map(mozziAnalogRead(2), 0, 1023, 0, (PATTERN_COUNT-1));
@@ -90,10 +119,10 @@ void updateControl(){
   
   if(kTriggerDelay.ready()){    
     if (patterns[pattern1][pattern1Beat]) {
-      aBamboo0.start();
+      (*sample1).start();
     }
     if (patterns[pattern2][pattern2Beat]) {
-      aBamboo1.start();
+      (*sample2).start();
     }
     if (patterns[pattern3][pattern3Beat]) {
       (*sample3).start();
@@ -114,12 +143,11 @@ void updateControl(){
   }
 }
 
-// TODO pointer to the current sample in each slot
 int updateAudio(){
   // sum together the playing samples
   int asig= (int)
-    ((long) aBamboo0.next()*255 +
-      aBamboo1.next()*255 +
+    ((long) (*sample1).next()*255 +
+      (*sample2).next()*255 +
       (*sample3).next()*255)>>4;
   
   //clip to keep audio loud but still in range
