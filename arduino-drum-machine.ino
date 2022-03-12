@@ -14,8 +14,6 @@
 #include <mozzi_rand.h>
 
 #define CONTROL_RATE 128
-#define XX true,
-#define __ false,
 #define CELLS_PER_SAMPLE 2048
 
 // Bank of sample
@@ -44,9 +42,6 @@ byte cursor1 = 0;
 byte cursor2 = 0;
 byte cursor3 = 0;
 
-// TODO
-// https://diyelectromusic.wordpress.com/2021/06/22/arduino-mozzi-sample-drum-machine/
-
 // the setup function runs once when you press reset or power the board
 void setup() {
   pinMode(2, INPUT_PULLUP);
@@ -72,7 +67,6 @@ void setup() {
 
   kTriggerDelay.set(10); // countdown ms, within resolution of CONTROL_RATE
 }
-
 
 bool shouldPlay(byte steps, byte beats, byte i) {
   float divisor = ((float)beats / (float)steps);
@@ -174,7 +168,6 @@ int updateAudio(){
   }
   return asig;
 }
-
 
 // the loop function runs over and over again forever
 void loop() {
