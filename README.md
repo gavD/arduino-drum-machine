@@ -115,7 +115,7 @@ This machine is totally hackable! You could:
 
 1. Add trigger outputs for each channel
 2. Add LEDs for each trigger notification
-3. Switch from predefined patterns to Euclidean distribution of pulses
-4. Vary velocities
-5. Pitch control of the voices (or a global pitch control!)
-6. Voice randomisation
+3. Vary velocities
+4. Pitch control of the voices (or a global pitch control!)
+5. Voice randomisation
+
